@@ -1,0 +1,3 @@
+liked: charlotte perkins gilman [author] (5.0/5, n=1), 19th-century [era] (5.0/5, n=1), folk [subgenre] (5.0/5, n=1), consequences-of-desire [theme] (5.0/5, n=1), w. w. jacobs [author] (5.0/5, n=1), early-20th [era] (5.0/5, n=1), gothic [subgenre] (5.0/5, n=1), descent-into-madness [theme] (5.0/5, n=1)
+disliked: weird [subgenre] (1.0/5, n=1), corporate-horror [theme] (1.0/5, n=1), contemporary [era] (2.0/5, n=3), found-footage [subgenre] (2.0/5, n=3), lost-media [theme] (1.0/5, n=1), mid-20th [era] (2.0/5, n=1), body-horror [subgenre] (2.0/5, n=1), psychological-breakdown [theme] (1.0/5, n=1)
+(from 6 rated stories; n = stories behind each figure. Weight these preferences against the channel criteria — they refine the channel, they never override it.)
