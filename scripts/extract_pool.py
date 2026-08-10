@@ -1,8 +1,8 @@
 """
-extract_pool.py — build the evaluation dataset from the recorded horror_readaloud run.
+extract_pool.py — build the evaluation dataset from the recorded infinite_audiobook run.
 
 The dataset for this eval is not synthetic and is not hand-written. It is lifted
-from an actual production curation run in the sibling project `horror_readaloud`:
+from an actual production curation run in the sibling project `infinite_audiobook`:
 `curation_runs` row id=5, 2026-07-28 06:38 UTC, model claude-sonnet-5, $0.0512 —
 the run written up in that project's JOURNAL **Entry 37**.
 
@@ -26,13 +26,13 @@ cannot silently drift from the journal it cites: 11 Lovecraft titles, and a sour
 mix of 28 gutenberg / 3 creepypasta. If either assertion fails, the recorded run is
 not the run the journal describes and the script refuses to write.
 
-The source database is gitignored in horror_readaloud and is NOT redistributed here
+The source database is gitignored in infinite_audiobook and is NOT redistributed here
 — only this derived metadata (titles, authors, public catalogue references, and
 model-generated notes). No story text is copied by this script or stored in this
 repo. See README §Content and data.
 
 Run:
-    python scripts/extract_pool.py [--db ../horror_readaloud/data/app.db]
+    python scripts/extract_pool.py [--db ../infinite_audiobook/data/app.db]
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
-DEFAULT_DB = ROOT.parent / "horror_readaloud" / "data" / "app.db"
+DEFAULT_DB = ROOT.parent / "infinite_audiobook" / "data" / "app.db"
 RUN_ID = 5
 
 # What JOURNAL Entry 37 says this run did. Asserted, not assumed.
@@ -128,7 +128,7 @@ def main() -> None:
     (DATA / "labels.json").write_text(json.dumps(labels, indent=2) + "\n")
 
     meta = {
-        "source_project": "horror_readaloud",
+        "source_project": "infinite_audiobook",
         "source_table": "curation_runs",
         "source_run_id": args.run_id,
         "source_run_created_at": row["created_at"],

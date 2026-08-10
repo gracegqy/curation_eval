@@ -151,7 +151,7 @@ def main() -> None:
     recorded = [c["title"] for c in pool]
     n_rec_cosmic = sum(1 for t in recorded if labels[t]["cosmic_horror"])
     print("-" * 72)
-    print("RECORDED PRODUCTION RUN (horror_readaloud JOURNAL Entry 37)")
+    print("RECORDED PRODUCTION RUN (infinite_audiobook JOURNAL Entry 37)")
     print("-" * 72)
     print(f"  selected {len(recorded)} titles, {n_rec_cosmic} cosmic horror "
           f"=> share {n_rec_cosmic / len(recorded):.3f}")

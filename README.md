@@ -6,7 +6,7 @@ the two things the original hand-rolled version did not have: a **parameter swee
 and **uncertainty**.
 
 The experiment is not synthetic. It comes from a sibling project,
-[`horror_readaloud`](#where-the-data-comes-from), a self-hosted read-aloud fiction
+[`infinite_audiobook`](#where-the-data-comes-from), a self-hosted read-aloud fiction
 library where an LLM curates short fiction against editable channel criteria and a
 taste profile learned from the listener's ratings.
 
@@ -149,7 +149,7 @@ worth adhering to.
 ## Where the data comes from
 
 `data/` is derived by `scripts/extract_pool.py` from `curation_runs` row id=5 in
-`horror_readaloud` — 2026-07-28, `claude-sonnet-5`, $0.0512, written up as JOURNAL
+`infinite_audiobook` — 2026-07-28, `claude-sonnet-5`, $0.0512, written up as JOURNAL
 Entry 37.
 
 **Content and rights.** No story text or audio is in this repo, and none is

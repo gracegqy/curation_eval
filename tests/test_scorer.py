@@ -1,7 +1,7 @@
 """Scorer tests, anchored to the real recorded outcome.
 
 The important one is `test_recorded_run_reproduces_entry_37`. The 2026-07-28
-production run in horror_readaloud selected all 31 of these titles, 11 of them
+production run in infinite_audiobook selected all 31 of these titles, 11 of them
 cosmic horror. If this scorer is correct, feeding it that exact selection must
 produce 11/31 = 0.355 — the number JOURNAL Entry 37 reports. That is the only
 ground truth available at $0, and it is a real one: it ties the harness to a

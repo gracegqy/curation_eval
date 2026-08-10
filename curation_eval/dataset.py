@@ -1,6 +1,6 @@
 """Build the Inspect dataset: one sample per (profile condition x slot count).
 
-The experiment under test comes from horror_readaloud JOURNAL Entries 34/35/37.
+The experiment under test comes from infinite_audiobook JOURNAL Entries 34/35/37.
 A taste profile says the listener dislikes `weird [subgenre]` — cosmic horror.
 The curator is asked to select k titles from a reputation-ranked candidate pool
 in which 11 of 31 titles are cosmic horror. The question is whether the stated

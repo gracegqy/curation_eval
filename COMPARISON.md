@@ -1,11 +1,11 @@
 # Inspect vs. the hand-rolled version
 
 The comparison the [skill diagnostic](README.md#why-this-repo-exists) asked for:
-one Sackett/horror_readaloud-style scoring task reproduced in an established
+one Sackett/infinite_audiobook-style scoring task reproduced in an established
 framework, then an honest account of **what the framework does that the hand-rolled
 version didn't, and what it can't express.**
 
-The hand-rolled version is the A/A′/B comparison in `horror_readaloud` JOURNAL
+The hand-rolled version is the A/A′/B comparison in `infinite_audiobook` JOURNAL
 Entries 34/35/37 — a sandboxed script, run twice, a week apart, producing a table
 of three numbers in a journal entry. The Inspect version is this repo.
 
