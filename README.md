@@ -161,23 +161,11 @@ underlying fiction is public domain (Gutenberg) or author-owned and merely
 
 ---
 
-## Why this repo exists
+## Reading the framework comparison
 
-It closes a specific, named gap. An external skill diagnostic of this codebase's
-author found strong LLM-pipeline and process-governance work sitting on top of a
-measurement layer that was **descriptive rates only — no confidence intervals, no
-inter-rater reliability, no significance** — and **zero exposure to standard eval
-tooling**, so there was no way to know what a hand-rolled harness was missing.
-
-`COMPARISON.md` is the answer to the second half: what Inspect does that the
-hand-rolled version didn't, and — the part that is usually left out — what it
-can't express.
-
-The first half was closed separately, in the pipeline where the numbers actually
-go to a supervisor: intervals were retrofitted onto every sampled rate there,
-which turned up that the escalation-rate confidence interval **breaches the
-approved budget cap** — a fact invisible to the point estimate that had been
-reported for a week.
+`COMPARISON.md` is an account of what Inspect does that a hand-rolled harness
+didn't — and, the part usually left out, what it can't express. It was written
+after building both versions, so it argues from use rather than from docs.
 
 ## License
 

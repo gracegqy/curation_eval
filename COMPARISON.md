@@ -1,7 +1,6 @@
 # Inspect vs. the hand-rolled version
 
-The comparison the [skill diagnostic](README.md#why-this-repo-exists) asked for:
-one Sackett/infinite_audiobook-style scoring task reproduced in an established
+One `infinite_audiobook`-style scoring task reproduced in an established
 framework, then an honest account of **what the framework does that the hand-rolled
 version didn't, and what it can't express.**
 
@@ -24,9 +23,9 @@ repeats meant editing the script, re-running by hand, and writing my own
 aggregation. Here it is a command-line argument.
 
 **2. `stderr()` and `bootstrap_stderr()` ship as metrics.** Uncertainty is a
-one-line declaration next to the scorer, not a statistics project. The reason the
-diagnostic could say "descriptive rates only, no confidence intervals" about years
-of work is partly that computing them was always *a separate task you had to
+one-line declaration next to the scorer, not a statistics project. The reason
+years of my own measurement work stayed at descriptive rates with no confidence
+intervals is partly that computing them was always *a separate task you had to
 decide to do*. When it is a default in the metric list, the failure mode of
 forgetting stops existing.
 
@@ -76,9 +75,9 @@ correction — `excess_over_floor` — is domain reasoning, and it is the differ
 between a real result and a manufactured failure.
 
 **3. Clustering is not in the metric set.** `stderr()` treats samples as
-independent. In the sibling statistics retrofit on the Sackett pipeline, the same
-naive assumption made an interval **too narrow by a design effect of 11** —
-observations were nested inside documents. Inspect gives you `bootstrap_stderr`,
+independent. In a separate extraction pipeline of mine, the same naive assumption
+made an interval **too narrow by a design effect of 11** — observations were
+nested inside documents. Inspect gives you `bootstrap_stderr`,
 not a *cluster* bootstrap; if your samples share structure, the default is wrong
 and nothing warns you. Here every sample is a separate prompt, so independence
 holds — but that is a fact about my dataset, not about the framework.
