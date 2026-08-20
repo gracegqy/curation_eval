@@ -1,4 +1,13 @@
+<!-- BOARD
+next: Grace's call: approve the API spend for the LIVE sweep, or park the repo. The harness is built and validated at $0; nothing else here moves until that decision.
+-->
+
 # curation_eval
+
+> **What this is:** Inspect eval harness reproducing infinite_audiobook's failed LLM-curation experiment, with a parameter sweep and uncertainty the original lacked.
+> **Read order:** README.md → COMPARISON.md → curation_eval/
+> **Next physical act:** Grace's call: approve the API spend for the LIVE sweep, or park the repo. The harness is built and validated at $0; nothing else here moves until that decision.
+> **Where this sits:** `python3 _META_working_knowledge/scripts/board.py` — status is derived there, never stored here.
 
 An [Inspect](https://inspect.aisi.org.uk/) eval that reproduces a real
 LLM-curation experiment — one that **failed in production** — and rebuilds it with
