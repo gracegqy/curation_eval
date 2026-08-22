@@ -18,7 +18,13 @@ from inspect_ai.scorer import Target
 from inspect_ai.solver import TaskState
 
 from curation_eval.dataset import arithmetic_floor, build_dataset, load_labels, load_pool
-from curation_eval.scorer import cosmic_share, parse_titles, well_formed
+from curation_eval.scorer import (
+    cosmic_share,
+    mean_well_formed,
+    parse_titles,
+    stderr_well_formed,
+    well_formed,
+)
 
 
 def _state(completion: str, metadata: dict) -> TaskState:
@@ -125,6 +131,69 @@ def test_parse_titles_edge_cases():
     assert parse_titles('["a","b"]') == (["a", "b"], None)
 
 
+# ------------------------------------------------ degenerate output (the 8/17 gate)
+
+
+def test_degenerate_output_is_not_scored_as_perfect_adherence():
+    """A refusal, an empty array, and an all-out-of-pool answer must not score 0.0.
+
+    Lower is better on this metric, so 0.0 is the best score there is. The 2026-08-17
+    publication review found `value=share if n_sel else 0.0`, which handed exactly
+    that score to every degenerate completion — while the module docstring claimed
+    "a silent parse failure cannot look like a good score". This is the test for the
+    property the docstring promises.
+    """
+    import math
+
+    for completion in (
+        "I'm sorry, I can't help with that.",
+        "[]",
+        json.dumps(["Not A Real Title", "Also Not Real"]),
+    ):
+        res = _score(completion, k=12)
+        assert res.metadata["n_selected"] == 0
+        assert math.isnan(res.value), f"{completion!r} scored {res.value!r}, not nan"
+
+
+def _sample_scores(values):
+    from inspect_ai.scorer import SampleScore, Score
+
+    return [SampleScore(score=Score(value=v)) for v in values]
+
+
+def test_mean_drops_degenerate_samples_instead_of_folding_them_in():
+    """The whole point: one refusal must not drag the adherence figure toward 0."""
+    good = [0.4, 0.6]
+    assert mean_well_formed()(_sample_scores(good)) == pytest.approx(0.5)
+    # a nan sample joins them: the figure must not move
+    assert mean_well_formed()(
+        _sample_scores(good + [float("nan")])
+    ) == pytest.approx(0.5)
+    # and numpy's plain mean is what we are NOT doing
+    import numpy as np
+
+    assert np.isnan(np.mean(good + [float("nan")]))
+
+
+def test_mean_of_all_degenerate_is_nan_not_zero():
+    import math
+
+    assert math.isnan(mean_well_formed()(_sample_scores([float("nan")] * 3)))
+
+
+def test_stderr_uses_the_same_denominator_as_the_mean():
+    import numpy as np
+
+    vals = [0.2, 0.4, 0.6]
+    expected = float(np.std(vals, ddof=1) / np.sqrt(len(vals)))
+    assert stderr_well_formed()(_sample_scores(vals)) == pytest.approx(expected)
+    assert stderr_well_formed()(
+        _sample_scores(vals + [float("nan")])
+    ) == pytest.approx(expected)
+    # fewer than two well-formed samples: 0.0, mirroring inspect's own stderr guard
+    assert stderr_well_formed()(_sample_scores([0.5, float("nan")])) == 0.0
+
+
 # --------------------------------------------------------------- well_formed
 
 
@@ -163,3 +232,27 @@ def test_profile_only_appears_in_profile_condition():
     assert "taste profile" not in by_id["k12-control"].input
     # the dislike under test must actually be present
     assert "weird [subgenre] (1.0/5" in by_id["k12-profile"].input
+
+
+# ------------------------------------------------------- the -T slots override
+
+
+def test_slots_override_accepts_every_form_the_cli_produces():
+    """`-T slots=12,28` arrives as a list, not a string.
+
+    The 2026-08-17 review found that the documented CLI override raised
+    `ValueError: invalid literal for int() with base 10: '[12'`, because the only
+    handled form was `str`. All three forms must work, and the default sweep must
+    survive an override that is falsy-but-absent.
+    """
+    from curation_eval.task import DEFAULT_SLOTS, curation_adherence
+
+    expected = {"k12-control", "k12-profile", "k28-control", "k28-profile"}
+    assert {s.id for s in curation_adherence(slots="12,28").dataset} == expected
+    assert {s.id for s in curation_adherence(slots=[12, 28]).dataset} == expected
+    assert {s.id for s in curation_adherence(slots=["12", " 28 "]).dataset} == expected
+    assert {s.id for s in curation_adherence(slots=12).dataset} == {
+        "k12-control",
+        "k12-profile",
+    }
+    assert len(curation_adherence().dataset) == 2 * len(DEFAULT_SLOTS)

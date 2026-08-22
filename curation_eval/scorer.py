@@ -17,6 +17,15 @@ Two deliberate choices worth arguing with:
    the model is actually responsible for. Reading the raw share alone at k=28
    would manufacture a failure out of combinatorics.
 
+3. **Degenerate output scores NaN, not 0.0, and is excluded from the mean.**
+   Lower is better here, so `0.0` is the *best score there is* — scoring a refusal,
+   an empty array, or a completion with nothing matching the pool as `0.0` would
+   read as perfect adherence and `mean()` would fold it into the headline number.
+   Those samples score `nan`, and `mean_well_formed`/`stderr_well_formed` below drop
+   them. **The count of dropped samples is not lost: it is exactly what the
+   `well_formed` scorer measures. Read the two numbers together — an adherence
+   figure over 3 of 50 samples is not an adherence figure.**
+
 Title matching is exact after normalisation (case, whitespace, smart quotes).
 Anything the model returns that is not in the pool is recorded as `unmatched` and
 counted in the denominator of nothing — it is reported so a silent parse failure
@@ -29,7 +38,19 @@ import json
 import re
 import unicodedata
 
-from inspect_ai.scorer import Score, Scorer, Target, accuracy, mean, scorer, stderr
+from inspect_ai.scorer import (
+    Metric,
+    SampleScore,
+    Score,
+    Scorer,
+    Target,
+    ValueToFloat,
+    accuracy,
+    metric,
+    scorer,
+    stderr,
+    value_to_float,
+)
 from inspect_ai.solver import TaskState
 
 from curation_eval.dataset import load_labels, load_pool
@@ -58,7 +79,61 @@ def parse_titles(text: str) -> tuple[list[str], str | None]:
     return [str(x) for x in parsed], None
 
 
-@scorer(metrics=[mean(), stderr()])
+def _well_formed_values(
+    scores: list[SampleScore], to_float: ValueToFloat
+) -> list[float]:
+    """The subset of scores that are real numbers.
+
+    A degenerate sample scores `nan` (see the module docstring). numpy propagates
+    nan through mean/std, so one refusal in a 50-sample sweep would turn the whole
+    headline figure into `nan` — loud, but it also destroys 49 good measurements.
+    Dropping them here keeps the figure readable; `well_formed` reports how many
+    were dropped.
+    """
+    import numpy as np
+
+    values = [to_float(s.score.value) for s in scores]
+    return [v for v in values if not np.isnan(v)]
+
+
+@metric
+def mean_well_formed(to_float: ValueToFloat = value_to_float()) -> Metric:
+    """Mean cosmic share over well-formed samples only (nan samples dropped)."""
+
+    def metric(scores: list[SampleScore]) -> float:
+        import numpy as np
+
+        values = _well_formed_values(scores, to_float)
+        if not values:
+            # Every sample was degenerate. Returning 0.0 here would be the exact
+            # bug this metric exists to prevent — 0.0 is the best possible score.
+            return float("nan")
+        return float(np.mean(values))
+
+    return metric
+
+
+@metric
+def stderr_well_formed(to_float: ValueToFloat = value_to_float()) -> Metric:
+    """Standard error of the mean over well-formed samples only.
+
+    Mirrors inspect's own `stderr()` (sample std, ddof=1, divided by sqrt(n)) with
+    the nan samples removed first, so it reports the uncertainty of the number
+    `mean_well_formed` actually returns rather than of a different denominator.
+    """
+
+    def metric(scores: list[SampleScore]) -> float:
+        import numpy as np
+
+        values = _well_formed_values(scores, to_float)
+        if len(values) - 1 < 1:
+            return 0.0
+        return float(np.std(values, ddof=1) / np.sqrt(len(values)))
+
+    return metric
+
+
+@scorer(metrics=[mean_well_formed(), stderr_well_formed()])
 def cosmic_share() -> Scorer:
     """Share of the selection that is cosmic horror (the disliked subgenre)."""
     pool = load_pool()
@@ -100,7 +175,8 @@ def cosmic_share() -> Scorer:
             explanation += f"; COUNT MISMATCH: returned {n_sel}, asked {k}"
 
         return Score(
-            value=share if n_sel else 0.0,
+            # nan, never 0.0 — on this metric 0.0 is the best possible score.
+            value=share,
             answer=json.dumps(dedup),
             explanation=explanation,
             metadata={

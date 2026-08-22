@@ -1,12 +1,12 @@
 <!-- BOARD
-next: Decide: approve the API spend for the live sweep, or park it
+next: Create the GitHub repo and flip it public (publication gate is clear)
 -->
 
 # curation_eval
 
 > **What this is:** Inspect eval harness reproducing infinite_audiobook's failed LLM-curation experiment, with a parameter sweep and uncertainty the original lacked.
 > **Read order:** README.md → COMPARISON.md → curation_eval/
-> **Next physical act:** Decide: approve the API spend for the live sweep, or park it
+> **Next physical act:** Create the GitHub repo and flip it public (publication gate is clear; the live-sweep spend decision is still open and does **not** block the flip)
 > **Where this sits:** `python3 _META_working_knowledge/scripts/board.py` — status is derived there, never stored here.
 
 An [Inspect](https://inspect.aisi.org.uk/) eval that reproduces a real
@@ -60,7 +60,7 @@ curation_eval/scorer.py    cosmic_share + well_formed
 curation_eval/task.py      the Inspect task
 scripts/extract_pool.py    derives the dataset from the recorded production run
 scripts/replay_baselines.py  $0 deterministic reference curves
-tests/                     11 tests, incl. the historical ground-truth anchor
+tests/                     16 tests, incl. the historical ground-truth anchor
 ```
 
 ### Run it
@@ -68,7 +68,7 @@ tests/                     11 tests, incl. the historical ground-truth anchor
 ```bash
 pip install -e ".[dev]"
 
-pytest                                      # 11 tests, no network
+pytest                                      # 16 tests, no network
 python scripts/replay_baselines.py          # $0, no API key, no spend
 inspect eval curation_eval/task.py --model mockllm/model     # $0 plumbing check
 
@@ -115,7 +115,16 @@ Two things fall out of that table that were not visible before it existed:
   (0.550 → 0.393). Any effect size measured as "treatment minus control" therefore
   depends on k in a way a two-point experiment cannot see at all.
 
-**3. The arithmetic floor is reported next to every score.** The pool has 11 cosmic
+**3. A degenerate answer cannot look like a perfect one.** Lower is better on this
+metric, so `0.0` is the best score there is — which means a refusal, an empty array,
+or a completion with nothing matching the pool must *not* score `0.0`. They score
+`nan` and are dropped from the mean; the `well_formed` scorer counts how many were
+dropped, so the pair reads together (an adherence figure over 3 of 50 samples is not
+an adherence figure). The `mockllm` plumbing check above is the demonstration: it
+returns garbage, and the harness reports `mean_well_formed nan / well_formed 0.000`
+rather than perfect adherence.
+
+**4. The arithmetic floor is reported next to every score.** The pool has 11 cosmic
 titles out of 31, so at k=28 at least 8 of 28 (28.6%) *must* be cosmic no matter
 what the model does. `excess_over_floor` is the part the model is responsible for.
 Reporting the raw share alone at high k would manufacture a failure out of

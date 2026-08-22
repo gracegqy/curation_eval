@@ -37,16 +37,24 @@ def per_sample_system():
 
 
 @task
-def curation_adherence(slots: str | None = None):
+def curation_adherence(slots: str | int | list[str | int] | None = None):
     """Does a stated taste dislike survive into the curator's selection, and does
     that depend on how many slots it is filling?
 
     Args:
-        slots: comma-separated slot counts, e.g. "12,40". Defaults to the sweep.
+        slots: slot counts to sweep, e.g. `-T slots=12,28`. Defaults to the sweep.
+
+    Note on the parameter type: inspect parses a comma-separated `-T` value into a
+    **list**, not a string, so the documented `-T slots=12,28` arrives here as
+    `[12, 28]`. An earlier version only handled `str` and did `str(slots).split(",")`,
+    which turned that list into `"[12, 28]"` and raised `ValueError: invalid literal
+    for int() with base 10: '[12'` — the CLI override its own docstring documented
+    could not be used. Both forms are accepted now, plus a bare `-T slots=12`.
     """
     chosen = DEFAULT_SLOTS
     if slots:
-        chosen = tuple(int(s) for s in str(slots).split(",") if s.strip())
+        raw = slots if isinstance(slots, (list, tuple)) else str(slots).split(",")
+        chosen = tuple(int(str(s).strip()) for s in raw if str(s).strip())
 
     return Task(
         dataset=build_dataset(chosen),
