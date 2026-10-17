@@ -1,12 +1,12 @@
 <!-- BOARD
-next: Create the GitHub repo and flip it public (publication gate is clear)
+next: Run the live sweep — blocked on Grace's explicit API-spend go-ahead, which is hers alone to give
 -->
 
 # curation_eval
 
 > **What this is:** Inspect eval harness reproducing infinite_audiobook's failed LLM-curation experiment, with a parameter sweep and uncertainty the original lacked.
 > **Read order:** README.md → COMPARISON.md → curation_eval/
-> **Next physical act:** Create the GitHub repo and flip it public (publication gate is clear; the live-sweep spend decision is still open and does **not** block the flip)
+> **Next physical act:** Run the live sweep. The repo is public; the only open decision left is the API spend, which needs Grace's explicit go-ahead
 > **Where this sits:** `python3 _META_working_knowledge/scripts/board.py` — status is derived there, never stored here.
 
 An [Inspect](https://inspect.aisi.org.uk/) eval that reproduces a real
